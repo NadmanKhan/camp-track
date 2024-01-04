@@ -24,7 +24,7 @@ const SHEET_CONFIG: SheetConfig = {
         sheetName: 'Progress',
     },
     summary: {
-        sheetName: 'Summary',
+        sheetName: 'Daily Summary',
     },
 } as const;
 
