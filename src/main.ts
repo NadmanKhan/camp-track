@@ -296,12 +296,18 @@ export function fetchSolveSetMapForUser(
     }
 
     for (const submissionTuple of submissions) {
-        const [userId, problemIndex, _time, _result] = submissionTuple;
+        const [userId, problemIndex, result, _time] = submissionTuple;
         const index = mapUserIdToIndex.get(userId) ?? -1;
-        if (index !== -1) {
+        if (index !== -1 && result === 1) {
             map.get(usernames[index])!.add(problemIndex);
         }
     }
+
+    const asArray = Array.from(map.entries()).map(([username, set]) => [
+        username,
+        Array.from(set).toSorted((a, b) => a - b),
+    ]);
+    Logger.log(`Solve set map for ${contest.id}: ${JSON.stringify(asArray)}`);
 
     return map;
 }
@@ -368,6 +374,9 @@ export function computeProgressMap(
             );
             solveProgress.count = Math.max(solveProgress.count, 0);
 
+            Logger.log(`For ${participants[i].name} on ${task.contest.id} ---`);
+            Logger.log(`solve set: ${Array.from(solveSet)}`)
+            Logger.log(`progress : ${JSON.stringify(solveProgress)}`);
             progressAggregate.solveProgressList.push(solveProgress);
         }
 
@@ -386,7 +395,8 @@ export function computeProgressMap(
                 (acc, solveProgress) => acc + solveProgress.count,
                 0
             );
-
+        
+        Logger.log(`progress aggregate for ${participants[i].name}: ${JSON.stringify(progressAggregate)}`);
         progressMap.set(participants[i].id, progressAggregate);
     }
 
