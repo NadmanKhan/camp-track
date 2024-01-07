@@ -1,3 +1,5 @@
+import he from 'he';
+
 // Webpack GasPlugin will turn this into a dummy top level function for GAS:
 global.main = () => {};
 
@@ -254,7 +256,10 @@ export function fetchContest(contestId: string): Contest {
     const html = response.getContentText();
     const json = html.match(/name="dataJson">(.+?)<\/textarea>/)![1];
     const data = JSON.parse(json) as Fetched.ContestPage.Data;
+
     assert(data.id === parseInt(contestId), 'Contest ID mismatch');
+
+    const title = he.decode(data.title);
 
     const problems = data.problems
         .sort((a, b) => (a.num < b.num ? -1 : a.num > b.num ? 1 : 0))
@@ -262,7 +267,7 @@ export function fetchContest(contestId: string): Contest {
 
     return {
         id: contestId,
-        title: data.title,
+        title,
         problems,
     };
 }
